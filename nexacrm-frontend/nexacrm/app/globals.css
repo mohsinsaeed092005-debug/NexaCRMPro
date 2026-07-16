@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+:root {
+  /* Surfaces */
+  --canvas: #EEF4FF;
+  --surface: #FFFFFF;
+  --surface-raised: #FBFCFF;
+  --ink-950: #070A16;
+  --ink-900: #0C1023;
+  --ink-800: #151A33;
+  --ink-700: #202744;
+
+  /* Text */
+  --text-primary: #11182F;
+  --text-secondary: #5C667E;
+  --text-tertiary: #929CB2;
+  --text-on-ink: #F8FAFF;
+  --text-on-ink-muted: #A8B1CC;
+
+  /* Borders */
+  --line: #DFE7F5;
+  --line-strong: #CCD8EA;
+  --line-on-ink: #252C46;
+
+  /* Brand / signal */
+  --signal: #7C5CFF;
+  --signal-dark: #5B3FE8;
+  --signal-soft: #F0ECFF;
+  --signal-on-ink-soft: #241C52;
+
+  /* Status */
+  --emerald: #00A982;
+  --emerald-soft: #E3FBF4;
+  --amber: #B77900;
+  --amber-soft: #FFF2D9;
+  --rose: #EF3F61;
+  --rose-soft: #FFE8EE;
+  --sky: #08A7C7;
+  --sky-soft: #E3F8FC;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  --shadow-card: 0 12px 30px -22px rgba(19, 29, 65, 0.46), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  --shadow-raised: 0 24px 64px -34px rgba(17, 24, 47, 0.34), 0 12px 24px -20px rgba(124, 92, 255, 0.28);
+  --shadow-pop: 0 26px 72px -24px rgba(10, 14, 34, 0.38);
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink-950: var(--ink-950);
+  --color-ink-900: var(--ink-900);
+  --color-ink-800: var(--ink-800);
+  --color-ink-700: var(--ink-700);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-on-ink: var(--text-on-ink);
+  --color-text-on-ink-muted: var(--text-on-ink-muted);
+
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-line-on-ink: var(--line-on-ink);
+
+  --color-signal: var(--signal);
+  --color-signal-dark: var(--signal-dark);
+  --color-signal-soft: var(--signal-soft);
+
+  --color-emerald: var(--emerald);
+  --color-emerald-soft: var(--emerald-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-rose: var(--rose);
+  --color-rose-soft: var(--rose-soft);
+  --color-sky: var(--sky);
+  --color-sky-soft: var(--sky-soft);
+
+  --font-display: var(--font-sora), ui-sans-serif, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+}
+
+* {
+  border-color: var(--line);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at 14% -10%, rgba(8, 167, 199, 0.18), transparent 28rem),
+    radial-gradient(circle at 100% 0%, rgba(124, 92, 255, 0.18), transparent 30rem),
+    linear-gradient(135deg, #F6FAFF 0%, var(--canvas) 52%, #F4F0FF 100%);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(124, 92, 255, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Signal pulse — the app's recurring live-status motif */
+@keyframes signal-pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  70% { transform: scale(1.9); opacity: 0; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+.signal-dot { position: relative; }
+.signal-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: signal-pulse 2.2s cubic-bezier(0.2, 0.7, 0.4, 1) infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes orbit-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbit-spin-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes orbit-pulse {
+  0%, 100% { transform: scale(0.92); opacity: 0.5; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
+@keyframes orbit-dash {
+  0% { stroke-dashoffset: 560; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.animate-orbit-spin {
+  animation: orbit-spin 18s linear infinite;
+}
+
+.animate-orbit-spin-reverse {
+  animation: orbit-spin-reverse 24s linear infinite;
+}
+
+.animate-orbit-pulse {
+  animation: orbit-pulse 4s ease-in-out infinite;
+}
+
+.animate-orbit-dash {
+  animation: orbit-dash 4.5s ease-in-out infinite alternate;
+}
+
+/* thin scrollbars for internal panels */
+.scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; }
+.scroll-thin::-webkit-scrollbar-track { background: transparent; }
