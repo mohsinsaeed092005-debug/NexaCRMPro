@@ -9,8 +9,15 @@ const eslintConfig = defineConfig([
   globalIgnores([
     // Default ignores of eslint-config-next:
     ".next/**",
+    "**/.next/**",
     "out/**",
+    "**/out/**",
     "build/**",
+    "**/build/**",
+    "firebase-files/**",
+    "nexacrm-frontend/**",
+    "node_modules/**",
+    "**/node_modules/**",
     "next-env.d.ts",
   ]),
 ]);

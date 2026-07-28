@@ -6,5 +6,6 @@ out
 .env.*
 .env*.local
 *.local
+*.zip
 npm-debug.log*
 tsconfig.tsbuildinfo
