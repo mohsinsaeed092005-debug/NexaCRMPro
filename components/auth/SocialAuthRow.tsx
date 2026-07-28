@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export function SocialAuthRow() {
   const router = useRouter();
-  const { signInWithGoogle, authError, clearAuthError, configured } = useAuth();
+  const { signInWithGoogle, clearAuthError, configured } = useAuth();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   async function handleGoogleSignIn() {
@@ -32,12 +32,6 @@ export function SocialAuthRow() {
         </span>
         <div className="h-px flex-1 bg-line" />
       </div>
-
-      {authError && (
-        <p className="mt-4 rounded-lg border border-rose/30 bg-rose/5 px-3 py-2 text-[12.5px] text-rose">
-          {authError}
-        </p>
-      )}
 
       <div className="mt-5 grid grid-cols-2 gap-3">
         <button

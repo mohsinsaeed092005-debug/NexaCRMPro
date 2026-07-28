@@ -61,6 +61,14 @@ function friendlyAuthError(code: string): string {
       return "Popup was blocked. Allow popups for this site and try again.";
     case "auth/account-exists-with-different-credential":
       return "An account already exists with this email using a different sign-in method.";
+    case "auth/operation-not-allowed":
+      return "Google sign-in is not enabled for this Firebase project.";
+    case "auth/unauthorized-domain":
+      return "This domain is not authorized in Firebase Authentication settings.";
+    case "permission-denied":
+      return "Login worked, but Firestore rules blocked profile access.";
+    case "unavailable":
+      return "Firebase is temporarily unavailable. Please try again.";
     default:
       return "Something went wrong. Please try again.";
   }
@@ -69,6 +77,35 @@ function friendlyAuthError(code: string): string {
 function assertFirebaseReady() {
   if (!auth || !db) {
     throw new Error(firebaseSetupMessage);
+  }
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message === firebaseSetupMessage) {
+    return error.message;
+  }
+
+  return friendlyAuthError(
+    typeof error === "object" && error && "code" in error
+      ? String(error.code)
+      : ""
+  );
+}
+
+async function syncUserProfile(firebaseUser: User, name?: string) {
+  if (!db) {
+    return;
+  }
+
+  const userRef = doc(db, "users", firebaseUser.uid);
+  const existingProfile = await getDoc(userRef);
+
+  if (!existingProfile.exists()) {
+    await setDoc(userRef, {
+      name: name || firebaseUser.displayName || "User",
+      email: firebaseUser.email || "",
+      createdAt: serverTimestamp(),
+    });
   }
 }
 
@@ -108,21 +145,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           );
 
           await updateProfile(credential.user, { displayName: name });
-          await setDoc(doc(db!, "users", credential.user.uid), {
-            name,
-            email,
-            createdAt: serverTimestamp(),
-          });
+          await syncUserProfile(credential.user, name);
         } catch (error) {
-          const message =
-            error instanceof Error && error.message === firebaseSetupMessage
-              ? error.message
-              : friendlyAuthError(
-                  typeof error === "object" && error && "code" in error
-                    ? String(error.code)
-                    : ""
-                );
-          setAuthError(message);
+          setAuthError(getErrorMessage(error));
           throw error;
         }
       },
@@ -132,15 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           assertFirebaseReady();
           await signInWithEmailAndPassword(auth!, email, password);
         } catch (error) {
-          const message =
-            error instanceof Error && error.message === firebaseSetupMessage
-              ? error.message
-              : friendlyAuthError(
-                  typeof error === "object" && error && "code" in error
-                    ? String(error.code)
-                    : ""
-                );
-          setAuthError(message);
+          setAuthError(getErrorMessage(error));
           throw error;
         }
       },
@@ -151,26 +168,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const provider = new GoogleAuthProvider();
           provider.setCustomParameters({ prompt: "select_account" });
           const credential = await signInWithPopup(auth!, provider);
-          const userRef = doc(db!, "users", credential.user.uid);
-          const existingProfile = await getDoc(userRef);
-
-          if (!existingProfile.exists()) {
-            await setDoc(userRef, {
-              name: credential.user.displayName || "User",
-              email: credential.user.email || "",
-              createdAt: serverTimestamp(),
-            });
+          try {
+            await syncUserProfile(credential.user);
+          } catch (profileError) {
+            console.warn("Could not sync Firebase user profile.", profileError);
           }
         } catch (error) {
-          const message =
-            error instanceof Error && error.message === firebaseSetupMessage
-              ? error.message
-              : friendlyAuthError(
-                  typeof error === "object" && error && "code" in error
-                    ? String(error.code)
-                    : ""
-                );
-          setAuthError(message);
+          setAuthError(getErrorMessage(error));
           throw error;
         }
       },
@@ -180,15 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           assertFirebaseReady();
           await signOut(auth!);
         } catch (error) {
-          const message =
-            error instanceof Error && error.message === firebaseSetupMessage
-              ? error.message
-              : friendlyAuthError(
-                  typeof error === "object" && error && "code" in error
-                    ? String(error.code)
-                    : ""
-                );
-          setAuthError(message);
+          setAuthError(getErrorMessage(error));
           throw error;
         }
       },
